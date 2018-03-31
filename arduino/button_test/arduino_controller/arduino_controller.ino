@@ -72,7 +72,7 @@ void on_unknown_command(void){
 void unlatch_pins(){
   for(pin=0;pin<3;pin++){
     pin_latched[pin]=0;
-    pin_latch_value[pin] = 0;
+    pin_latch_value[pin]=0;
   }
     c.sendCmd(lights, "pins unlatched");
 }
