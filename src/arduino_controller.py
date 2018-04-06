@@ -1,11 +1,9 @@
 from PyCmdMessenger import ArduinoBoard, CmdMessenger
-import obswsrc
-import pudb
 
 COMMANDS = [['ping', ''],
             ['pong', 's'],
             ['player', 'i'],
-            ['lights', 's'],
+            ['lights', 'i'],
             ['get_state', ''],
             ['ret_state', 'i*'],
             ['release_latches', 's'],
@@ -19,6 +17,9 @@ class NgalacArduinoController():
         Use pseudo terminal to test, ie:
         https://stackoverflow.com/questions/52187/virtual-serial-port-for-linux
         miniterm.py to spy
+
+        soscat -d -d pty,raw,echo=0 pty,raw,echo=0
+          opens a tty connection with 2 ends.  Device on 1, io on other
     '''
 
     def __init__(self,
@@ -37,7 +38,8 @@ class NgalacArduinoController():
             pass  # heh, logging pls thx
         self.cmd_seq_num += 1
 
-    def _recv_cmd(self, cmd):
+    def _recv_cmd(self):
+        msg = None
         try:
             msg = self.c.receive()
         except EOFError:
@@ -45,14 +47,20 @@ class NgalacArduinoController():
             pass
 
         if msg:
-            return _parse_msg(msg)
+            return self._parse_msg(msg)
         else:
             pass
 
+    def clear(self):
+        while self._recv_cmd() is not None:
+            pass
+
+    def rec(self):
+        return self._recv_cmd()
+
     def _parse_msg(self, msg):
-        # self.last_cmd, value, self.exec_time = msg
-        value = msg
-        return value
+        cmd, value, self.exec_time = msg
+        return (cmd, value)
 
     def ping(self):
         return self._send_cmd('ping')
@@ -61,7 +69,7 @@ class NgalacArduinoController():
         return self._send_cmd('player')
 
     def lights(self, on=True):
-        return self._send_cmd('lights', True)
+        return self._send_cmd('lights', on)
 
     def get_state(self):
         return self._send_cmd('get_state')
