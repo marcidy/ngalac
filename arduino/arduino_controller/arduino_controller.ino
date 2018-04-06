@@ -100,9 +100,7 @@ void read_btns(void) {
     uint8_t temp[3];
 
     for(pin=0;pin<3;pin++){
-        temp[pin] = (y_old[pin] >> 2);
-        y_old[pin] = y_old[pin] - temp[pin];
-        // y_old[pin] = y_old[pin] - (y_old[pin] >> 2);
+        y_old[pin] = y_old[pin] - (y_old[pin] >> 2);
 
         if(digitalRead(input_pins[pin])){y_old[pin] = y_old[pin] + 0x3F;}
 

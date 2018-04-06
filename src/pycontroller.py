@@ -36,7 +36,7 @@ async def main():
                         await obsws.require(StartStopRecordingRequest())
                         g.release_latches()
 
-                        obs_status = await obsws.require(GetStreamingStatusRequest())
+                        obs_status = await obsws.require(GetStreamingStatusRequest())  #NOQA
                         obs_streaming = obs_status['streaming']
                         obs_recording = obs_status['recording']
 
