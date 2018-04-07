@@ -14,10 +14,9 @@ import time
 
 
 async def main():
-    g = arduino("/dev/ttyUSB1")
+    g = arduino("COM5")
     g.release_latches()
     streaming = False
-    obs_recording = False
     obs_streaming = False
 
     async with OBSWS('localhost', 4444, 'password') as obsws:
@@ -33,18 +32,17 @@ async def main():
                     print("{}: {}".format(cmd, state))
 
                     if state[11] == 1:
-                        await obsws.require(StartStopRecordingRequest())
+                        await obsws.require(StartStopStreamingRequest())
                         g.release_latches()
 
                         obs_status = await obsws.require(GetStreamingStatusRequest())  #NOQA
                         obs_streaming = obs_status['streaming']
-                        obs_recording = obs_status['recording']
 
-                if streaming and not (obs_recording or obs_streaming):
+                if streaming and not obs_streaming:
                     streaming = False
                     g.lights(0)
 
-                elif not streaming and (obs_recording or obs_streaming):
+                elif not streaming and obs_streaming:
                     streaming = True
                     g.lights(1)
 

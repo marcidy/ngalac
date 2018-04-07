@@ -12,13 +12,14 @@ enum {
     error
 };
 
-uint8_t pin_latch_value[3] = {0, 0, 0};
-uint8_t pin_latched[3] = {1, 1, 1};
-uint8_t pin_active[3] = {1, 1, 1};
-uint8_t pin_state[3] = {1, 1, 1};
+const int NUM_PINS = 3;
+uint8_t pin_latch_value[NUM_PINS] = {0, 0, 0};
+uint8_t pin_latched[NUM_PINS] = {1, 1, 1};
+uint8_t pin_active[NUM_PINS] = {1, 1, 1};
+uint8_t pin_state[NUM_PINS] = {1, 1, 1};
 
-int input_pins[3] = {9, 10, 11};
-int output_pins[3] = {5, 6, 7};
+int input_pins[NUM_PINS] = {10, 11, 12};
+int output_pins[NUM_PINS] = {5, 6, 7};
 
 int light_state = LOW;
 int pressure_btn = 0;
@@ -37,16 +38,16 @@ void do_pong(void){
 
 void send_state(void){
     c.sendCmdStart(ret_state);
-    for(pin=0; pin<3; pin++) {
+    for(pin=0; pin<NUM_PINS; pin++) {
         c.sendCmdBinArg((int)pin_state[pin]);
     }
-    for(pin=0; pin<3; pin++) {
+    for(pin=0; pin<NUM_PINS; pin++) {
         c.sendCmdBinArg((int)digitalRead(output_pins[pin]));
     }
-    for(pin=0; pin<3; pin++) {
+    for(pin=0; pin<NUM_PINS; pin++) {
         c.sendCmdBinArg((int)pin_latched[pin]);
     }
-    for(pin=0; pin<3; pin++) {
+    for(pin=0; pin<NUM_PINS; pin++) {
         c.sendCmdBinArg((int)pin_latch_value[pin]);
     }
     c.sendCmdEnd();
@@ -66,7 +67,7 @@ void lights_handler(void){
         light_state = HIGH;
     }
 
-    for(pin=0; pin<3; pin++) {
+    for(pin=0; pin<NUM_PINS; pin++) {
         digitalWrite(output_pins[pin], light_state);
     }
     send_state();
@@ -77,7 +78,7 @@ void on_unknown_command(void){
 }
 
 void unlatch_pins(){
-    for(pin=0;pin<3;pin++){
+    for(pin=0;pin<NUM_PINS;pin++){
         pin_latched[pin]=0;
         pin_latch_value[pin]=0;
     }
@@ -95,11 +96,11 @@ void attach_callbacks(void) {
 }
 
 void read_btns(void) {
-    static uint8_t y_old[3]={0,0,0};
+    static uint8_t y_old[NUM_PINS]={0,0,0};
     int state_change = 0;
-    uint8_t temp[3];
+    uint8_t temp[NUM_PINS];
 
-    for(pin=0;pin<3;pin++){
+    for(pin=0;pin<NUM_PINS;pin++){
         y_old[pin] = y_old[pin] - (y_old[pin] >> 2);
 
         if(digitalRead(input_pins[pin])){y_old[pin] = y_old[pin] + 0x3F;}
@@ -125,7 +126,7 @@ void read_btns(void) {
 void setup() {
     Serial.begin(BAUD_RATE);
     attach_callbacks();
-    for(pin=0; pin<3; pin++) {
+    for(pin=0; pin<NUM_PINS; pin++) {
         pinMode(input_pins[pin], INPUT_PULLUP);
         pinMode(output_pins[pin], OUTPUT);
         digitalWrite(output_pins[pin], LOW);
