@@ -11,7 +11,7 @@ from arduino_controller import NgalacArduinoController as acontrol
 
 # need port detection to pass to arduino controller
 async def main():
-    g = acontrol()
+    g = acontrol(serial_port='COM5')
     streaming = False
 
     async with OBSWS('localhost', 4444, 'password') as obsws:
