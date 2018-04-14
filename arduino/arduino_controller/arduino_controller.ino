@@ -18,6 +18,9 @@ uint8_t pin_latched[3] = {0, 0, 0};
 uint8_t pin_latch_value[3] = {0, 0, 0};
 unsigned long bounce_delay = 75;
 
+uint8_t pwms_duty[4] = {0, 0, 0, 0};
+unsigned long timers[4] = {0, 0, 0, 0};
+
 int input_pins[3] = {11, 12, 13};
 int pressure_btn = 0;
 int stream_btn = 1;
@@ -112,6 +115,10 @@ void read_btns(void) {
    }
 }
 
+void show() {
+	pwms_duty[0] = pwms_duty[0] - 0x10;
+	analogWrite(6, pwms_duty[0]);
+}
 
 void setup() {
     Serial.begin(BAUD_RATE);
@@ -126,5 +133,6 @@ void setup() {
 void loop() {
     c.feedinSerialData();
     read_btns();
+		show();
 }
 
